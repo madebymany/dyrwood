@@ -19,12 +19,12 @@ type RefreshMaterializedViewRequest struct {
 	ViewName string `json:"view_name"`
 }
 
-func NewDyrwood(db *sql.DB) (out *Dyrwood) {
+func NewDyrwood(db *sql.DB, refreshDelaySeconds float64) (out *Dyrwood) {
 	out = &Dyrwood{
 		db:              db,
 		refreshViewChan: make(chan string),
 		refreshers:      make(map[string]chan struct{}),
-		refreshDelay:    10 * time.Second,
+		refreshDelay:    time.Duration(refreshDelaySeconds * float64(time.Second)),
 	}
 
 	go out.refreshViewListener()
@@ -52,7 +52,7 @@ func (self *Dyrwood) refreshViewListener() {
 			log.Printf("started refresher for '%s'", viewName)
 		}
 
-		// non-blocking channel send
+		// non-blocking channel send, drop values over buffer size
 		select {
 		case refresher <- struct{}{}:
 		default:
@@ -66,10 +66,13 @@ func (self *Dyrwood) refresher(viewName string, inChan chan struct{}) {
 
 	for _ = range inChan {
 		now = time.Now()
-		nextRefresh = lastRefreshed.Add(self.refreshDelay)
-		if now.Before(nextRefresh) {
-			log.Printf("sleeping for '%s'", viewName)
-			time.Sleep(nextRefresh.Sub(now))
+
+		if self.refreshDelay > 0 {
+			nextRefresh = lastRefreshed.Add(self.refreshDelay)
+			if now.Before(nextRefresh) {
+				log.Printf("sleeping for '%s'", viewName)
+				time.Sleep(nextRefresh.Sub(now))
+			}
 		}
 
 		_, err = self.db.Exec(fmt.Sprintf(

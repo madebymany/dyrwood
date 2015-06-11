@@ -58,9 +58,19 @@ func (self *Server) Serve() (err error) {
 	}
 	defer db.Close()
 
+	var refreshDelay float64
+	refreshDelayStr := os.Getenv("DYRWOOD_REFRESH_DELAY")
+	if refreshDelayStr == "" {
+		refreshDelayStr = "5"
+	}
+	refreshDelay, err = strconv.ParseFloat(refreshDelayStr, 64)
+	if err != nil {
+		return err
+	}
+
 	self.rpcServer = rpc.NewServer()
 
-	rpcHandler := NewDyrwood(db)
+	rpcHandler := NewDyrwood(db, refreshDelay)
 	self.rpcServer.Register(rpcHandler)
 
 	self.l, err = net.Listen("tcp", fmt.Sprintf(":%d", self.Port))
