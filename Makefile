@@ -6,7 +6,7 @@ all: go-build
 install:
 	mkdir -p "$(SERVICE_LOCATION)"
 	install -o root -g root -m 755 "$(GO_PATH)/bin/$(BIN)" "/usr/local/bin/$(BIN)"
-	mkdir -p "/etc/sv/$(BIN)"
+	mkdir -p "/etc/sv/$(BIN)" "/etc/service"
 	cp -R runit/* "/etc/sv/$(BIN)/"
 	ln -s "/etc/sv/$(BIN)" "/etc/service/"
 
