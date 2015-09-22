@@ -1,4 +1,4 @@
 #!/bin/bash
 set -e pipefail
 
-exec runit-log dyrwood
+exec runit-log "dyrwood"

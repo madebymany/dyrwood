@@ -1,0 +1,34 @@
+# Force rebuild: 1
+
+packages:
+  branch_codenames:
+    master: trusty-unstable
+    production: trusty-stable
+
+github_base_url: "https://github.com/madebymany/dyrwood"
+
+notifications:
+  slack:
+    channel: "#devops"
+
+jobs:
+  dyrwood:
+    builder: "make"
+    base: "quay.io/madebymany/build-bases:trusty"
+    apt_keys:
+      - "https://apt.mxmdev.com/mxmops.gpg.key"
+    apt_repos:
+      - "deb https://apt.mxmdev.com trusty-stable main"
+    build_depends:
+      - "go"
+    promote_through:
+      - unstable
+      - stable
+    packages:
+      - type: debian
+        name: dyrwood
+        target: install
+        depends:
+          - "runit-common"
+        repos:
+          - mxm-public

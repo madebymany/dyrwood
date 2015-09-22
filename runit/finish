@@ -1,9 +1,4 @@
-#!/bin/sh
+#!/bin/bash
+set -e pipefail
 
-SERVICE_NAME="dyrwood"
-
-if [[ "$1" -eq "1" ]]; then
-  slackcat "@channel ${SERVICE_NAME} failed to run"
-fi
-
-echo "stopping ${SERVICE_NAME}" | logger -t "${SERVICE_NAME}"
+exec runit-finish -n "dyrwood"

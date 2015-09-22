@@ -1,8 +1,4 @@
 #!/bin/bash
-set -eo pipefail
+set -e pipefail
 
-. "$(which global-env)"
-
-exec 2>&1
-
-exec chpst -u nobody:nogroup dyrwood
+exec runit-start -n "dyrwood" -u "nobody" -g "nogroup" -c "dyrwood"
