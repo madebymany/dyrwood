@@ -1,0 +1,8 @@
+#!/bin/bash
+set -eo pipefail
+
+. "$(which global-env)"
+
+exec 2>&1
+
+exec chpst -u nobody:nogroup dyrwood
