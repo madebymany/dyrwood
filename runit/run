@@ -1,4 +1,0 @@
-#!/bin/bash
-set -e pipefail
-
-exec runit-start -n "dyrwood" -u "nobody" -g "nogroup" -c "dyrwood"
